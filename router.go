@@ -7,6 +7,8 @@ import (
 
 func initRouter(r *gin.Engine) {
 	// public directory is used to serve static resources
+	//注册静态文件的路由处理
+	//当客户端请求"./static/example.jpg"时,Gin框架将会在"./public"目录下寻找example.jpg文件
 	r.Static("/static", "./public")
 
 	apiRouter := r.Group("/douyin")
