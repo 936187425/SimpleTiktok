@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	//
+	//开始服务
 	go service.RunMessageServer()
 
 	r := gin.Default()
