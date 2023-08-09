@@ -2,9 +2,9 @@ package init_mysql
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/model"
 	"os"
 	"strings"
+	"tiktok/model"
 )
 
 var userTable = "./Model.sql"

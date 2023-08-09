@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"github.com/RaymondCode/simple-demo/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"tiktok/model"
 	"time"
 )
 

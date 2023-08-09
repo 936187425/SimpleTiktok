@@ -2,11 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/model"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"net/http"
 	"strconv"
+	"tiktok/model"
 	"time"
 )
 

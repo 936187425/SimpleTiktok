@@ -1,6 +1,6 @@
 package controller
 
-import "github.com/RaymondCode/simple-demo/model"
+import "tiktok/model"
 
 var DemoVideos = []model.Video{
 	{

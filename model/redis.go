@@ -2,8 +2,8 @@ package model
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/config"
 	"github.com/go-redis/redis"
+	"tiktok/config"
 )
 
 var RedisHandle *redis.Client

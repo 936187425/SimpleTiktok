@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/config"
-	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
-	_ "gorm.io/driver/mysql"
-	_ "gorm.io/gorm"
+	"tiktok/config"
+	"tiktok/service"
 )
 
 func main() {
