@@ -16,5 +16,5 @@ func main() {
 	initRouter(r)
 
 	//默认是8080端口
-	r.Run(fmt.Sprintf("0.0.0.0:%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(fmt.Sprintf("127.0.0.1:%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
