@@ -27,7 +27,6 @@ func Publish(c *gin.Context) {
 	// 验证token
 	username, err := model.RedisHandle.Get(token).Result()
 	if err == redis.Nil {
-		//fmt.Printf(err.Error())
 		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "token已失效"})
 		c.Abort()
 		return
@@ -66,6 +65,7 @@ func Publish(c *gin.Context) {
 		Extension:   ext,
 		UserID:      u.Id,
 		CreatedTime: time.Now(),
+		UpdatedTime: time.Now(),
 		PlayUrl:     playurl,
 	}
 	model.MysqlHandle.Create(&video)

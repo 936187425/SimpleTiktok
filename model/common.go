@@ -25,7 +25,7 @@ type VideoModel struct {
 	CoverUrl      string    `json:"cover_url,omitempty" db:"cover_url"`
 	FavoriteCount uint      `json:"favorite_count,omitempty" db:"favorite_count"`
 	CommentCount  uint      `json:"comment_count,omitempty" db:"comment_count"`
-	IsFavorite    bool      `json:"is_favorite,omitempty" db:"is_favorite"`
+	IsFavorite    bool      `json:"is_favorite,omitempty" db:"is_favorite"` // 当前登录用户对该视频是否点赞
 	Title         string    `json:"title" db:"title" gorm:"not null"`
 	Extension     string    `json:"extension" db:"extension"`
 	CreatedTime   time.Time `json:"created_time" db:"created_time" gorm:"not null"`
@@ -83,4 +83,12 @@ type MessageSendEvent struct {
 type MessagePushEvent struct {
 	FromUserId int64  `json:"user_id,omitempty"`
 	MsgContent string `json:"msg_content,omitempty"`
+}
+
+type Favorite struct {
+	Id int64 `json:"id,omitempty" db:"id" gorm:"not null;unique"`
+	//CreateTime time.Time `json:"createTime,omitempty" db:"create_time" gorm:"not null;default:current_timestamp"`
+	//UpdateTime time.Time `json:"deleteTime,omitempty" db:"delete_time" gorm:"not null;default:current_timestamp"`
+	UserId  int64 `json:"id,omitempty" db:"id" gorm:"not null;"`
+	VideoId int64 `json:"id,omitempty" db:"id" gorm:"not null;"`
 }

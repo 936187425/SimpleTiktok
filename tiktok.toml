@@ -10,7 +10,7 @@ host="127.0.0.1"
 #连接mysql的用户
 user="root"
 #数据库密码
-password="sb1234567890SB"
+password="root"
 #数据库名称
 database="tiktok"
 
