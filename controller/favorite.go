@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"net/http"
@@ -87,10 +88,77 @@ func FavoriteAction(c *gin.Context) {
 // FavoriteList all users have same favorite video list
 // 根据user_id去favorite表中查询
 func FavoriteList(c *gin.Context) {
+	user_id := c.Query("user_id")
+	token := c.Query("token")
+
+	// 验证token
+	_, err := model.RedisHandle.Get(token).Result()
+	if err == redis.Nil {
+		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "token已失效"})
+		c.Abort()
+		return
+	}
+
+	// 先在favorites表查询所有的video_id
+	var like []model.Favorite
+	model.MysqlHandle.Where("user_id = ?", user_id).Find(&like)
+
+	// 在voide_models表通过video_id查询到对应的video
+	var favoriteVideos []model.VideoModel
+	for i := 0; i < len(like); i++ {
+		video := model.VideoModel{}
+		model.MysqlHandle.Where("id = ?", like[i].VideoId).First(&video)
+		favoriteVideos = append(favoriteVideos, video)
+	}
+
+	if len(favoriteVideos) == 0 {
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: model.Response{
+				StatusCode: 0,
+				StatusMsg:  "喜欢列表为空",
+			},
+			VideoList: nil,
+		})
+		return
+	}
+
+	videoJson := []model.Video{}
+	for _, v := range favoriteVideos {
+		fmt.Println("yes")
+		u := new(model.UserModel)
+		model.MysqlHandle.Where("id = ?", v.UserID).First(u)
+		user := model.User{
+			Id:              u.Id,
+			Name:            u.Name,
+			FollowCount:     u.FollowerCount,
+			FollowerCount:   u.FollowerCount,
+			IsFollow:        u.IsFollow,
+			Avatar:          u.Avatar,
+			BackgroundImage: u.BackgroundImage,
+			Signature:       u.Signature,
+			TotalFavorited:  u.TotalFavorited,
+			WorkCount:       u.WorkCount,
+			FavoriteCount:   u.FavoriteCount,
+		}
+
+		video := model.Video{
+			Id:            v.Id,
+			Author:        user,
+			PlayUrl:       v.PlayUrl,
+			CoverUrl:      v.CoverUrl,
+			FavoriteCount: v.FavoriteCount,
+			CommentCount:  v.CommentCount,
+			IsFavorite:    v.IsFavorite,
+			Title:         v.Title,
+		}
+		videoJson = append(videoJson, video)
+	}
+
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: model.Response{
 			StatusCode: 0,
+			StatusMsg:  "喜欢列表查询成功",
 		},
-		VideoList: DemoVideos,
+		VideoList: videoJson,
 	})
 }
