@@ -2,8 +2,9 @@ package model
 
 import (
 	"fmt"
-	"github.com/go-redis/redis"
 	"tiktok/config"
+
+	"github.com/go-redis/redis"
 )
 
 var RedisHandle *redis.Client
@@ -21,6 +22,6 @@ func init() {
 	} else if err != nil {
 		fmt.Printf("Redis 连接失败！")
 	} else {
-		fmt.Printf(pong)
+		fmt.Printf("Redis:%+v\n", pong)
 	}
 }

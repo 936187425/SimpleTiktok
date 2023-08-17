@@ -8,9 +8,9 @@ host="http://127.0.0.1"
 port=3306
 host="127.0.0.1"
 #连接mysql的用户
-user="root"
+user="hypan"
 #数据库密码
-password="sb1234567890SB"
+password="hypan"
 #数据库名称
 database="tiktok"
 

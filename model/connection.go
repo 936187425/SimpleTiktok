@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
+	"tiktok/config"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"tiktok/config"
 )
 
 // MysqlHandle global database handle
@@ -15,7 +16,7 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("数据库连接失败！"))
 	}
-	// 自动迁移
+	//自动迁移,会创建UserModels
 	db.AutoMigrate(&UserModel{}, &VideoModel{})
 	MysqlHandle = db.Debug()
 }
