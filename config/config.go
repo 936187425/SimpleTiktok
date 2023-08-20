@@ -60,5 +60,5 @@ func init() {
 
 func (m *mysql) DSN() string {
 	//return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=local", m.User, m.Password, m.Host, m.Port, m.Database)
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4", m.User, m.Password, m.Host, m.Port, m.Database)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", m.User, m.Password, m.Host, m.Port, m.Database)
 }

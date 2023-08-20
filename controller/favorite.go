@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"net/http"
@@ -124,7 +123,6 @@ func FavoriteList(c *gin.Context) {
 
 	videoJson := []model.Video{}
 	for _, v := range favoriteVideos {
-		fmt.Println("yes")
 		u := new(model.UserModel)
 		model.MysqlHandle.Where("id = ?", v.UserID).First(u)
 		user := model.User{

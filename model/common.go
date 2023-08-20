@@ -32,13 +32,6 @@ type VideoModel struct {
 	UpdatedTime   time.Time `json:"updated_time" db:"updated_time"`
 }
 
-type Comment struct {
-	Id         int64  `json:"id,omitempty"`
-	User       User   `json:"user"`
-	Content    string `json:"content,omitempty"`
-	CreateDate string `json:"create_date,omitempty"`
-}
-
 type User struct {
 	Id              int64  `json:"id,omitempty"`
 	Name            string `json:"name,omitempty"`
@@ -89,6 +82,22 @@ type Favorite struct {
 	Id int64 `json:"id,omitempty" db:"id" gorm:"not null;unique"`
 	//CreateTime time.Time `json:"createTime,omitempty" db:"create_time" gorm:"not null;default:current_timestamp"`
 	//UpdateTime time.Time `json:"deleteTime,omitempty" db:"delete_time" gorm:"not null;default:current_timestamp"`
-	UserId  int64 `json:"id,omitempty" db:"id" gorm:"not null;"`
-	VideoId int64 `json:"id,omitempty" db:"id" gorm:"not null;"`
+	UserId  int64 `json:"user_id,omitempty" db:"user_id" gorm:"not null;"`
+	VideoId int64 `json:"video_id,omitempty" db:"video_id" gorm:"not null;"`
+}
+
+type Comment struct {
+	Id         int64  `json:"id,omitempty"`
+	User       User   `json:"user,omitempty"`
+	VideoId    int64  `json:"video_id,omitempty"`
+	Content    string `json:"content,omitempty"`
+	CreateDate string `json:"create_date,omitempty"`
+}
+
+type CommentModel struct {
+	Id         int64     `json:"id,omitempty" db:"id" gorm:"not null;unique"`
+	UserId     int64     `json:"user_id,omitempty" db:"user_id" gorm:"not null;"`
+	VideoId    int64     `json:"video_id,omitempty" db:"video_id" gorm:"not null;"`
+	Content    string    `json:"content,omitempty" db:"content" gorm:"not null"`
+	CreateDate time.Time `json:"created_time" db:"create_Date" gorm:"not null"`
 }
