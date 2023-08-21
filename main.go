@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"tiktok/config"
 	"tiktok/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -16,5 +17,5 @@ func main() {
 	initRouter(r)
 
 	//默认是8080端口
-	r.Run(fmt.Sprintf("127.0.0.1:%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(fmt.Sprintf("192.168.3.51:%d", config.Server.Port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

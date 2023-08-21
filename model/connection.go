@@ -16,7 +16,7 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("数据库连接失败！"))
 	}
-	//自动迁移,会创建UserModels
-	db.AutoMigrate(&UserModel{}, &VideoModel{})
+	//自动迁移,会创建UserModel,VideoModel.
+	db.AutoMigrate(&UserModel{}, &VideoModel{}, &FriendListModel{},&MessageModel{})
 	MysqlHandle = db.Debug()
 }

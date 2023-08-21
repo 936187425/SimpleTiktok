@@ -76,11 +76,26 @@ type Message struct {
 
 type MessageSendEvent struct {
 	UserId     int64  `json:"user_id,omitempty"`
-	ToUserId   int64  `json:"to_user_id,omitempty"`
-	MsgContent string `json:"msg_content,omitempty"`
+	ToUserId   int64  `json:"to_user_id,omitempty" `
+	MsgContent string `json:"msg_content,omitempty" `
 }
 
 type MessagePushEvent struct {
 	FromUserId int64  `json:"user_id,omitempty"`
 	MsgContent string `json:"msg_content,omitempty"`
+}
+
+
+type FriendListModel struct{
+	Name string `json:"name,omitempty" db:"name" gorm:"unique;not null"`
+	List string `json:"list" db:"list"`
+}
+
+
+type MessageModel struct{
+	Id int `json:"id" db:"id" gorm:"unique,not null"`
+	To_user_id int `json:"to_user_id" db:"to_user_id" gorm:"not null"`
+	From_user_id int `json:"from_user_id" db:"from_user_id" gorm:"not null"`
+	Content string `json:"content" db:"content"`
+	Create_time int64 `json:"create_time" db:"create_time"`
 }
