@@ -101,3 +101,11 @@ type CommentModel struct {
 	Content    string    `json:"content,omitempty" db:"content" gorm:"not null"`
 	CreateDate time.Time `json:"created_time" db:"create_Date" gorm:"not null"`
 }
+
+type Relation struct {
+	Id         int64     `json:"id,omitempty" db:"id" gorm:"not null;unique"`
+	FromUserId int64     `json:"from_user_id,omitempty" db:"from_user_id" gorm:"not null;"`
+	ToUserId   int64     `json:"to_user_id,omitempty" db:"to_user_id" gorm:"not null;"`
+	CreateDate time.Time `json:"created_time" db:"create_Date" gorm:"not null"`
+	Content    string    `json:"content,omitempty" db:"content" gorm:"not null"`
+}

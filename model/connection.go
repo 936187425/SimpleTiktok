@@ -16,6 +16,6 @@ func init() {
 		panic(fmt.Errorf("数据库连接失败！"))
 	}
 	// 自动迁移
-	db.AutoMigrate(&UserModel{}, &VideoModel{}, &Favorite{}, &CommentModel{})
+	db.AutoMigrate(&UserModel{}, &VideoModel{}, &Favorite{}, &CommentModel{}, &Relation{})
 	MysqlHandle = db.Debug()
 }

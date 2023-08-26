@@ -128,7 +128,7 @@ func FavoriteList(c *gin.Context) {
 		user := model.User{
 			Id:              u.Id,
 			Name:            u.Name,
-			FollowCount:     u.FollowerCount,
+			FollowCount:     u.FollowCount,
 			FollowerCount:   u.FollowerCount,
 			IsFollow:        u.IsFollow,
 			Avatar:          u.Avatar,
