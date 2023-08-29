@@ -2,12 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
-	"sync/atomic"
 	"tiktok/model"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 var tempChat = map[string][]model.Message{}
@@ -20,51 +21,102 @@ type ChatResponse struct {
 }
 
 // MessageAction no practical effect, just check if token is valid
+// 发送消息
 func MessageAction(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
 	content := c.Query("content")
-
-	if user, exist := usersLoginInfo[token]; exist {
-		userIdB, _ := strconv.Atoi(toUserId)
-		chatKey := genChatKey(user.Id, int64(userIdB))
-
-		atomic.AddInt64(&messageIdSequence, 1)
-		curMessage := model.Message{
-			Id:         messageIdSequence,
-			Content:    content,
-			CreateTime: time.Now().Format(time.Kitchen),
-		}
-
-		if messages, exist := tempChat[chatKey]; exist {
-			tempChat[chatKey] = append(messages, curMessage)
-		} else {
-			tempChat[chatKey] = []model.Message{curMessage}
-		}
-		c.JSON(http.StatusOK, model.Response{StatusCode: 0})
-	} else {
-		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	username, err := model.RedisHandle.Get(token).Result()
+	if err != nil {
+		log.Printf(" MessageAction API: Token:%s donesn't exist\n", token)
+		c.JSON(http.StatusForbidden, UserListResponse{
+			Response: model.Response{
+				StatusCode: -1,
+				StatusMsg:  fmt.Sprintf("Token:%s does not exist\n", token),
+			},
+			UserList: nil,
+		})
+		c.Abort()
+		return
 	}
+
+	// 拿到当前登录的user
+	fromUser := new(model.UserModel)
+	model.MysqlHandle.Where("name = ?", username).First(fromUser)
+
+	// 查找接收消息的用户
+	toUserIdint, err := strconv.Atoi(toUserId)
+	toUser := new(model.UserModel)
+	result := model.MysqlHandle.Where("id = ?", toUserIdint).First(toUser)
+
+	// 接收消息的用户不存在
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: -1,
+			StatusMsg:  "fromUserId is not a correct id",
+		})
+		c.Abort()
+		return
+	}
+
+	//插入表中
+	msg := model.MessageModel{
+		ToUserId:   toUserIdint,
+		FromUserId: int(fromUser.Id),
+		Content:    content,
+		CreateTime: time.Now().Unix(),
+	}
+	model.MysqlHandle.Table("message_models").Create(&msg)
+	c.JSON(http.StatusOK,
+		model.Response{
+			StatusCode: 0,
+			StatusMsg:  "insert successfully!",
+		},
+	)
 }
 
 // MessageChat all users have same follow list
+// 获得聊天记录
 func MessageChat(c *gin.Context) {
 	token := c.Query("token")
 	toUserId := c.Query("to_user_id")
-
-	if user, exist := usersLoginInfo[token]; exist {
-		userIdB, _ := strconv.Atoi(toUserId)
-		chatKey := genChatKey(user.Id, int64(userIdB))
-
-		c.JSON(http.StatusOK, ChatResponse{Response: model.Response{StatusCode: 0}, MessageList: tempChat[chatKey]})
-	} else {
-		c.JSON(http.StatusOK, model.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+	//先查询redis看看token是否存在
+	username, err := model.RedisHandle.Get(token).Result()
+	if err != nil {
+		log.Printf(" MessageChat API: Token:%s donesn't exist\n", token)
+		c.JSON(http.StatusForbidden, UserListResponse{
+			Response: model.Response{
+				StatusCode: -1,
+				StatusMsg:  fmt.Sprintf("Token:%s does not exist\n", token),
+			},
+			UserList: nil,
+		})
+		c.Abort()
+		return
 	}
-}
+	// token存在
+	// 拿到当前登录的user
+	fromUser := new(model.UserModel)
+	model.MysqlHandle.Where("name = ?", username).First(fromUser)
 
-func genChatKey(userIdA int64, userIdB int64) string {
-	if userIdA > userIdB {
-		return fmt.Sprintf("%d_%d", userIdB, userIdA)
+	var msgContent []model.MessageModel
+	model.MysqlHandle.Table("message_models").Where("from_user_id = ? and to_user_id = ?", fromUser.Id, toUserId).Find(&msgContent)
+
+	var msgContentJson []model.Message
+	for _, m := range msgContent {
+		msg := model.Message{
+			Id:         int64(m.Id),
+			Content:    m.Content,
+			CreateTime: strconv.FormatInt(m.CreateTime, 10),
+		}
+		msgContentJson = append(msgContentJson, msg)
 	}
-	return fmt.Sprintf("%d_%d", userIdA, userIdB)
+
+	c.JSON(http.StatusOK,
+		ChatResponse{
+			model.Response{
+				StatusCode: 0,
+			},
+			msgContentJson,
+		})
 }

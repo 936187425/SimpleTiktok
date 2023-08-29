@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"log"
 	"net/http"
 	"strconv"
 	"tiktok/model"
@@ -229,10 +231,81 @@ func FollowerList(c *gin.Context) {
 
 // FriendList all users have same friend list
 func FriendList(c *gin.Context) {
+	user_id := c.Query("user_id")
+	token := c.Query("token")
+	log.Printf("FriendLis API: User_id:%s Token:%s\n", user_id, token)
+
+	//先查询redis看看token是否存在
+	_, err := model.RedisHandle.Get(token).Result()
+	if err != nil {
+		log.Printf("FriendList API: Token:%s donesn't exist\n", token)
+		c.JSON(http.StatusForbidden, UserListResponse{
+			Response: model.Response{
+				StatusCode: -1,
+				StatusMsg:  fmt.Sprintf("Token:%s does not exist\n", token),
+			},
+			UserList: nil,
+		})
+		c.Abort()
+		return
+	}
+
+	// 判断user_id是否合法
+	var user = model.UserModel{}
+	result := model.MysqlHandle.Where("id = ?", user_id).First(&user)
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: model.Response{
+				StatusCode: -1,
+				StatusMsg:  "user_id不合法",
+			},
+			UserList: nil,
+		})
+		return
+	}
+
+	// 查找当前user的好友
+	var friendList []model.UserModel
+
+	// 查找当前user的关注列表
+	var userFollowRelationList []model.Relation
+	model.MysqlHandle.Where("from_user_id = ?", user.Id).Find(&userFollowRelationList)
+	fmt.Println(userFollowRelationList)
+
+	for _, relation := range userFollowRelationList {
+		var t_relation = model.Relation{}
+		// 如果对方也关注我了，那我们就是好友
+		result = model.MysqlHandle.Where("from_user_id = ? and to_user_id = ?", relation.ToUserId, user_id).First(&t_relation)
+		if result.RowsAffected == 0 {
+			continue
+		}
+		var user = model.UserModel{}
+		model.MysqlHandle.Where("id = ?", relation.ToUserId).First(&user)
+		friendList = append(friendList, user)
+	}
+
+	var friendListJson []model.User
+	for _, u := range friendList {
+		user := model.User{
+			Id:              u.Id,
+			Name:            u.Name,
+			FollowCount:     u.FollowCount,
+			FollowerCount:   u.FollowerCount,
+			IsFollow:        u.IsFollow,
+			Avatar:          u.Avatar,
+			BackgroundImage: u.BackgroundImage,
+			Signature:       u.Signature,
+			TotalFavorited:  u.TotalFavorited,
+			WorkCount:       u.WorkCount,
+			FavoriteCount:   u.FavoriteCount,
+		}
+		friendListJson = append(friendListJson, user)
+	}
+
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: model.Response{
 			StatusCode: 0,
 		},
-		UserList: []model.User{DemoUser},
+		UserList: friendListJson, //listSlice为null说明该username没有好友.
 	})
 }

@@ -107,5 +107,12 @@ type Relation struct {
 	FromUserId int64     `json:"from_user_id,omitempty" db:"from_user_id" gorm:"not null;"`
 	ToUserId   int64     `json:"to_user_id,omitempty" db:"to_user_id" gorm:"not null;"`
 	CreateDate time.Time `json:"created_time" db:"create_Date" gorm:"not null"`
-	Content    string    `json:"content,omitempty" db:"content" gorm:"not null"`
+}
+
+type MessageModel struct {
+	Id         int    `json:"id" db:"id" gorm:"unique,not null"`
+	ToUserId   int    `json:"to_user_id" db:"to_user_id" gorm:"not null"`
+	FromUserId int    `json:"from_user_id" db:"from_user_id" gorm:"not null"`
+	Content    string `json:"content" db:"content"`
+	CreateTime int64  `json:"create_time" db:"create_time"`
 }
